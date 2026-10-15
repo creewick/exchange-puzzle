@@ -20,7 +20,6 @@
   --line: #1c1408;
   --line-width: 1px;
   --dot-radius: 3px;
-  --bg-hole: var(--wood-dark);
   --wood:
     repeating-linear-gradient(
       93deg,
@@ -376,33 +375,40 @@ body {
   place-items: center;
   transform: translate(calc(var(--c) * 100%), calc(var(--r) * 100%));
   transition: transform var(--fall, 0.3s) var(--fall-ease);
-  will-change: transform;
   pointer-events: none;
 }
 
 .coin__face {
   --scale: 1;
   position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--coin-size, 86%);
-  height: var(--coin-size, 86%);
+  width: var(--coin-size);
+  height: var(--coin-size);
   border-radius: 50%;
-  background: var(--face);
-  box-shadow:
-    inset 0 -3px 0 rgb(0 0 0 / 0.18),
-    inset 0 2px 0 rgb(255 255 255 / 0.5),
-    0 2px 3px rgb(0 0 0 / 0.25);
-  color: var(--ink, #333);
-  font-weight: 800;
-  font-size: calc(var(--cell-size) * 0.26);
-  line-height: 1;
+  box-shadow: 0 2px 3px rgb(0 0 0 / 0.3);
   transform:
     perspective(260px)
     rotateX(calc(var(--tilt-y, 0) * var(--tilt-max) * -1))
     rotateY(calc(var(--tilt-x, 0) * var(--tilt-max)))
     scale(var(--scale));
   transition: transform 0.15s ease-out, box-shadow 0.12s;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.coin__tex {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--tint) var(--flatten), transparent),
+      color-mix(in srgb, var(--tint) var(--flatten), transparent)
+    ),
+    var(--texture) center / contain no-repeat;
+  background-blend-mode: color, normal;
+  filter: contrast(var(--texture-contrast)) brightness(var(--texture-brightness));
 }
 
 .coin__face::before,
@@ -422,13 +428,12 @@ body {
 }
 
 .coin__face::before {
-  --shade: linear-gradient(
+  background-image: linear-gradient(
     125deg,
     transparent 48%,
     rgb(0 0 0 / 0.12) 54%,
     rgb(0 0 0 / 0.28) 62%
   );
-  background-image: var(--shade);
 }
 
 .coin__face::after {
@@ -445,33 +450,24 @@ body {
   mix-blend-mode: overlay;
 }
 
+.coin[data-code="1"] .coin__tex,
 .coin[data-code="1"] .coin__face::before,
 .coin[data-code="1"] .coin__face::after,
+.coin[data-code="3"] .coin__tex,
 .coin[data-code="3"] .coin__face::before,
 .coin[data-code="3"] .coin__face::after {
   -webkit-mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
   mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
 }
 
-.coin[data-code="1"] .coin__face,
-.coin[data-code="3"] .coin__face {
-  background:
-    radial-gradient(circle, var(--bg-hole, #fafafa) 0 14%, rgb(0 0 0 / 0.25) 14% 17%, transparent 17%),
-    var(--face);
-}
-
-.coin[data-code="1"] .coin__face span,
-.coin[data-code="3"] .coin__face span {
-  transform: translateY(-62%);
-  font-size: 0.8em;
-}
-
-.coin[data-code="0"] { --coin-size: 72%; --face: radial-gradient(circle at 35% 30%, #fff, #c9ccd1); }
-.coin[data-code="1"] { --coin-size: 75%; --hole: 23%; --tint: #b89c4a; --face: radial-gradient(circle at 35% 30%, #fbe7a1, #c9a238); }
-.coin[data-code="2"] { --coin-size: 78%; --tint: #b07657; --face: radial-gradient(circle at 35% 30%, #e8a77a, #9c5428); --ink: #3d1c08; }
-.coin[data-code="3"] { --coin-size: 81%; --hole: 21%; --tint: #7a8ea3; --texture-brightness: 0.95; --face: radial-gradient(circle at 35% 30%, #fff, #a9adb4); }
-.coin[data-code="4"] { --coin-size: 84%; --tint: #c4c4c4; --texture-brightness: 1.22; --face: radial-gradient(circle at 35% 30%, #f4f5f7, #8e939b); }
-.coin[data-code="5"] { --coin-size: 88%; --tint: #c0b966; --face: radial-gradient(circle at 35% 30%, #fff1b8, #b88d2a); }
+.coin[data-code="1"] { --texture: url("images/5.png"); --coin-size: 75%; --hole: 23%; --tint: #b89c4a; }
+.coin[data-code="2"] { --texture: url("images/10.png"); --coin-size: 78%; --tint: #b07657; }
+.coin[data-code="3"] { --texture: url("images/50.png"); --coin-size: 81%; --hole: 21%; --tint: #7a8ea3; --texture-brightness: 0.95; }
+.coin[data-code="4"] { --texture: url("images/100.png"); --coin-size: 84%; --tint: #c4c4c4; --texture-brightness: 1.22; }
+.coin[data-code="5"] { --texture: url("images/500.png"); --coin-size: 88%; --tint: #c0b966; }
+.coin[data-code="6"] { --texture: url("images/1000.png"); --tint: #8d9ac4; }
+.coin[data-code="7"] { --texture: url("images/5000.png"); --tint: #a690b4; }
+.coin[data-code="8"] { --texture: url("images/10000.png"); --tint: #c4917c; }
 
 .coin[data-code="6"] .coin__face,
 .coin[data-code="7"] .coin__face,
@@ -480,40 +476,12 @@ body {
   height: auto;
   aspect-ratio: 2 / 1;
   border-radius: 2px;
-  font-size: calc(var(--cell-size) * 0.2);
 }
 
-.coin.is-textured[data-code="6"] .coin__face,
-.coin.is-textured[data-code="7"] .coin__face,
-.coin.is-textured[data-code="8"] .coin__face {
-  background-size: 100% 100%;
-}
-
-.coin[data-code="6"] { --tint: #8d9ac4; --face: linear-gradient(135deg, #b7d3ee, #5f8fbf); --ink: #10304f; }
-.coin[data-code="7"] { --tint: #a690b4; --face: linear-gradient(135deg, #e3c8ea, #9b6aa8); --ink: #3b1745; }
-.coin[data-code="8"] { --tint: #c4917c; --face: linear-gradient(135deg, #ead9b5, #a8865a); --ink: #3d2a0e; }
-
-.coin.is-textured .coin__face {
-  background: var(--texture) center / contain no-repeat;
-  box-shadow: 0 2px 3px rgb(0 0 0 / 0.3);
-  filter: contrast(var(--texture-contrast)) brightness(var(--texture-brightness));
-}
-
-.coin.is-textured .coin__face span {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--tint);
-  mix-blend-mode: color;
-  opacity: var(--flatten);
-  font-size: 0;
-  transform: none;
-}
-
-.coin.is-textured[data-code="1"] .coin__face span,
-.coin.is-textured[data-code="3"] .coin__face span {
-  -webkit-mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
-  mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
+.coin[data-code="6"] .coin__tex,
+.coin[data-code="7"] .coin__tex,
+.coin[data-code="8"] .coin__tex {
+  background-size: auto, 100% 100%;
 }
 
 .coin.is-selected .coin__face {
@@ -527,7 +495,7 @@ body {
 }
 
 .coin.is-born .coin__face {
-  animation: born 0.25s ease-out;
+  animation: born 0.2s ease-out;
 }
 
 @keyframes born {
@@ -540,8 +508,8 @@ body {
   z-index: 1;
   opacity: 0;
   transition:
-    transform 0.25s cubic-bezier(0.5, 0, 0.75, 0),
-    opacity 0.1s linear 0.15s;
+    transform 0.18s cubic-bezier(0.5, 0, 0.75, 0),
+    opacity 0.08s linear 0.1s;
 }
 
 .coin.is-merging .coin__face {

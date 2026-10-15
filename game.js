@@ -1,21 +1,10 @@
 'use strict';
 
 const VALUES = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000];
-const LABELS = ['1', '5', '10', '50', '100', '500', '1000', '5000', '10000'];
 const MAX_CODE = 8;
 
-const TEXTURES = {
-  1: 'images/5.png',
-  2: 'images/10.png',
-  3: 'images/50.png',
-  4: 'images/100.png',
-  5: 'images/500.png',
-  6: 'images/1000.png',
-  7: 'images/5000.png',
-  8: 'images/10000.png',
-};
+for (const value of VALUES.slice(1)) new Image().src = `images/${value}.png`;
 
-for (const src of Object.values(TEXTURES)) new Image().src = src;
 
 const SOUNDS = {
   coin: 'sounds/coin.wav',
@@ -31,10 +20,10 @@ const LEVELS = [
   { cols: 5, rows: 8, table: [1, 2, 3, 4, 5] },
 ];
 
-const MERGE_DURATION = 250;
+const MERGE_DURATION = 180;
 const HINT_DURATION = 3300;
 
-const GAME_OVER_DELAY = 900;
+const GAME_OVER_DELAY = 700;
 
 const LEVEL_NAMES = ['Лёгкий', 'Средний', 'Сложный'];
 
@@ -153,7 +142,7 @@ function createCounter(el, digits) {
     if (steps === 0) return;
 
     state.strip.style.transition =
-      `transform ${0.3 + 0.07 * steps}s cubic-bezier(0.3, 0.1, 0.25, 1) ${order * 0.07}s`;
+      `transform ${0.25 + 0.05 * steps}s cubic-bezier(0.3, 0.1, 0.25, 1) ${order * 0.05}s`;
     state.shown = state.pos + steps;
     state.pos = digit;
     state.strip.style.setProperty('--pos', state.shown);
@@ -197,6 +186,8 @@ let undoStack = [];
 let redoStack = [];
 
 const tiltedEls = new Set();
+let tiltFrame = 0;
+let pendingTiltEvent = null;
 
 function randomCoin() {
   const table = LEVELS[level].table;
@@ -209,15 +200,11 @@ function createCoinEl(code, r, c) {
   el.dataset.code = code;
   el.style.setProperty('--c', c);
   el.style.setProperty('--r', r);
-  if (TEXTURES[code]) {
-    el.classList.add('is-textured');
-    el.style.setProperty('--texture', `url("${TEXTURES[code]}")`);
-  }
   const face = document.createElement('div');
   face.className = 'coin__face';
-  const label = document.createElement('span');
-  label.textContent = LABELS[code];
-  face.append(label);
+  const tex = document.createElement('div');
+  tex.className = 'coin__tex';
+  face.append(tex);
   el.append(face);
   coinsEl.append(el);
   return el;
@@ -225,7 +212,7 @@ function createCoinEl(code, r, c) {
 
 function moveCoinTo(el, r, fromR) {
   const dist = Math.abs(r - fromR);
-  el.style.setProperty('--fall', `${0.15 + 0.06 * dist}s`);
+  el.style.setProperty('--fall', `${0.12 + 0.045 * dist}s`);
   el.style.setProperty('--r', r);
 }
 
@@ -453,7 +440,19 @@ function cellAt(event, tolerance = 0.5) {
   return { r, c };
 }
 
+function scheduleTilt(event) {
+  pendingTiltEvent = event;
+  if (!tiltFrame) {
+    tiltFrame = requestAnimationFrame(() => {
+      tiltFrame = 0;
+      updateTilt(pendingTiltEvent);
+    });
+  }
+}
+
 function resetTilt() {
+  cancelAnimationFrame(tiltFrame);
+  tiltFrame = 0;
   for (const el of tiltedEls) {
     el.style.removeProperty('--tilt-x');
     el.style.removeProperty('--tilt-y');
@@ -648,7 +647,7 @@ boardEl.addEventListener('pointermove', (e) => {
     if (cell) extendChain(cell);
   }
 
-  if (e.pointerType === 'mouse' || e.pointerId === activePointer) updateTilt(e);
+  if (e.pointerType === 'mouse' || e.pointerId === activePointer) scheduleTilt(e);
 });
 
 function endPointer(e, commit) {
