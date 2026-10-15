@@ -689,3 +689,7 @@ playAgainBtn.addEventListener('click', newGame);
 levelSelect.addEventListener('change', newGame);
 
 newGame();
+
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
