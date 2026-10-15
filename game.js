@@ -7,6 +7,7 @@ for (const value of VALUES.slice(1)) new Image().src = `images/${value}.png`;
 
 
 const SOUNDS = {
+  click: 'sounds/click.wav',
   coin: 'sounds/coin.wav',
   banknote: 'sounds/banknote.wav',
 };
@@ -61,20 +62,24 @@ const hintBtn = document.getElementById('hint');
 const redoBtn = document.getElementById('redo');
 const undoLastBtn = document.getElementById('undoLast');
 
-if ('audioSession' in navigator) navigator.audioSession.type = 'ambient';
-
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-const audioCtx = AudioContextClass ? new AudioContextClass() : null;
+const soundData = Object.fromEntries(Object.entries(SOUNDS).map(([name, src]) => [
+  name,
+  fetch(src).then((response) => {
+    if (!response.ok) throw new Error(response.statusText);
+    return response.arrayBuffer();
+  }),
+]));
 const soundBuffers = {};
 const soundFailed = {};
+let audioCtx = null;
 
-if (audioCtx) {
-  for (const [name, src] of Object.entries(SOUNDS)) {
-    fetch(src)
-      .then((response) => response.arrayBuffer())
-      .then((data) => audioCtx.decodeAudioData(data))
-      .then((buffer) => {
-        soundBuffers[name] = buffer;
+function decodeSounds() {
+  for (const [name, data] of Object.entries(soundData)) {
+    data
+      .then((buffer) => audioCtx.decodeAudioData(buffer))
+      .then((decoded) => {
+        soundBuffers[name] = decoded;
       })
       .catch(() => {
         soundFailed[name] = true;
@@ -83,19 +88,33 @@ if (audioCtx) {
 }
 
 function unlockAudio() {
-  if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+  if (!AudioContextClass) return;
+  if (!audioCtx) {
+    audioCtx = new AudioContextClass();
+    const silence = audioCtx.createBufferSource();
+    silence.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+    silence.connect(audioCtx.destination);
+    silence.start(0);
+    decodeSounds();
+  }
+  if (audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
 }
 
 function playSound(name) {
   const buffer = soundBuffers[name];
   if (audioCtx && buffer) {
+    if (audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
     source.connect(audioCtx.destination);
-    source.start();
-  } else if (!audioCtx || soundFailed[name]) {
+    source.start(0);
+  } else if (!AudioContextClass || soundFailed[name]) {
     new Audio(SOUNDS[name]).play().catch(() => {});
   }
+}
+
+for (const type of ['pointerdown', 'pointerup', 'touchend', 'click']) {
+  document.addEventListener(type, unlockAudio, { capture: true, passive: true });
 }
 
 function createCounter(el, digits) {
@@ -202,7 +221,9 @@ function createCoinEl(code, r, c) {
   face.className = 'coin__face';
   const tex = document.createElement('div');
   tex.className = 'coin__tex';
-  face.append(tex);
+  const tint = document.createElement('div');
+  tint.className = 'coin__tint';
+  face.append(tex, tint);
   el.append(face);
   coinsEl.append(el);
   return el;
@@ -515,6 +536,7 @@ function extendChain(cell) {
   if (sameCode && adjacent) {
     chain.push(cell);
     renderChain();
+    playSound('click');
   }
 }
 
@@ -626,7 +648,6 @@ function applyGravity() {
 }
 
 boardEl.addEventListener('pointerdown', (e) => {
-  unlockAudio();
   if (isOver || isMerging || activePointer !== null || e.button > 0) return;
   const cell = cellAt(e);
   if (!cell) return;
@@ -635,6 +656,7 @@ boardEl.addEventListener('pointerdown', (e) => {
   boardEl.setPointerCapture(e.pointerId);
   chain = [cell];
   renderChain();
+  playSound('click');
   updateTilt(e);
   e.preventDefault();
 });
@@ -660,10 +682,7 @@ function endPointer(e, commit) {
 boardEl.addEventListener('pointerleave', (e) => {
   if (e.pointerId !== activePointer) resetTilt();
 });
-boardEl.addEventListener('pointerup', (e) => {
-  unlockAudio();
-  endPointer(e, true);
-});
+boardEl.addEventListener('pointerup', (e) => endPointer(e, true));
 boardEl.addEventListener('pointercancel', (e) => endPointer(e, false));
 boardEl.addEventListener('lostpointercapture', (e) => endPointer(e, true));
 

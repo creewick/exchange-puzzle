@@ -375,6 +375,7 @@ body {
   place-items: center;
   transform: translate(calc(var(--c) * 100%), calc(var(--r) * 100%));
   transition: transform var(--fall, 0.3s) var(--fall-ease);
+  will-change: transform;
   pointer-events: none;
 }
 
@@ -401,14 +402,18 @@ body {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background:
-    linear-gradient(
-      color-mix(in srgb, var(--tint) var(--flatten), transparent),
-      color-mix(in srgb, var(--tint) var(--flatten), transparent)
-    ),
-    var(--texture) center / contain no-repeat;
-  background-blend-mode: color, normal;
+  background: var(--texture) center / contain no-repeat;
   filter: contrast(var(--texture-contrast)) brightness(var(--texture-brightness));
+}
+
+.coin__tint {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--tint);
+  mix-blend-mode: color;
+  opacity: var(--flatten);
+  pointer-events: none;
 }
 
 .coin__face::before,
@@ -450,10 +455,10 @@ body {
   mix-blend-mode: overlay;
 }
 
-.coin[data-code="1"] .coin__tex,
+.coin[data-code="1"] .coin__tint,
 .coin[data-code="1"] .coin__face::before,
 .coin[data-code="1"] .coin__face::after,
-.coin[data-code="3"] .coin__tex,
+.coin[data-code="3"] .coin__tint,
 .coin[data-code="3"] .coin__face::before,
 .coin[data-code="3"] .coin__face::after {
   -webkit-mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
@@ -481,7 +486,7 @@ body {
 .coin[data-code="6"] .coin__tex,
 .coin[data-code="7"] .coin__tex,
 .coin[data-code="8"] .coin__tex {
-  background-size: auto, 100% 100%;
+  background-size: 100% 100%;
 }
 
 .coin.is-selected .coin__face {

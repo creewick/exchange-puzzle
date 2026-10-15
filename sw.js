@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'exchange-puzzle-v3';
+const CACHE = 'exchange-puzzle-v4';
 
 const ASSETS = [
   './',
@@ -15,6 +15,7 @@ const ASSETS = [
   'images/1000.png',
   'images/5000.png',
   'images/10000.png',
+  'sounds/click.wav',
   'sounds/coin.wav',
   'sounds/banknote.wav',
 ];
