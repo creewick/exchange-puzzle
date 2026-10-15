@@ -1,17 +1,12 @@
 'use strict';
 
-const CACHE = 'exchange-puzzle-v1';
+const CACHE = 'exchange-puzzle-v3';
 
 const ASSETS = [
   './',
   'index.html',
   'style.css',
   'game.js',
-  'manifest.webmanifest',
-  'icons/icon-192.png',
-  'icons/icon-512.png',
-  'icons/icon-maskable-512.png',
-  'icons/apple-touch-icon.png',
   'images/5.png',
   'images/10.png',
   'images/50.png',
@@ -90,6 +85,10 @@ async function handle(event) {
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  const url = new URL(request.url);
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.pathname.includes('/icons/') || url.pathname.endsWith('.webmanifest')) return;
+  if (url.pathname.endsWith('/apple-touch-icon.png')) return;
+  if (request.mode === 'navigate' && !/\/(index\.html)?$/.test(url.pathname)) return;
   event.respondWith(handle(event));
 });

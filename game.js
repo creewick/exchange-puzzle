@@ -12,7 +12,6 @@ const SOUNDS = {
 };
 const BANKNOTE_MIN_CODE = 6;
 
-const SOUND_POOL_SIZE = 3;
 
 const LEVELS = [
   { cols: 6, rows: 9, table: [1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 5] },
@@ -62,42 +61,41 @@ const hintBtn = document.getElementById('hint');
 const redoBtn = document.getElementById('redo');
 const undoLastBtn = document.getElementById('undoLast');
 
-const sounds = Object.fromEntries(Object.entries(SOUNDS).map(([name, src]) => [name, {
-  pool: Array.from({ length: SOUND_POOL_SIZE }, () => {
-    const audio = new Audio(src);
-    audio.preload = 'auto';
-    return audio;
-  }),
-  next: 0,
-}]));
+if ('audioSession' in navigator) navigator.audioSession.type = 'ambient';
 
-let audioUnlocked = false;
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AudioContextClass ? new AudioContextClass() : null;
+const soundBuffers = {};
+const soundFailed = {};
 
-function unlockAudio() {
-  if (audioUnlocked) return;
-  for (const { pool } of Object.values(sounds)) {
-    for (const audio of pool) {
-      audio.muted = true;
-      audio.play()
-        .then(() => {
-          audio.pause();
-          audio.currentTime = 0;
-          audioUnlocked = true;
-        })
-        .catch(() => {})
-        .finally(() => {
-          audio.muted = false;
-        });
-    }
+if (audioCtx) {
+  for (const [name, src] of Object.entries(SOUNDS)) {
+    fetch(src)
+      .then((response) => response.arrayBuffer())
+      .then((data) => audioCtx.decodeAudioData(data))
+      .then((buffer) => {
+        soundBuffers[name] = buffer;
+      })
+      .catch(() => {
+        soundFailed[name] = true;
+      });
   }
 }
 
+function unlockAudio() {
+  if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+}
+
 function playSound(name) {
-  const sound = sounds[name];
-  const audio = sound.pool[sound.next];
-  sound.next = (sound.next + 1) % sound.pool.length;
-  audio.currentTime = 0;
-  audio.play().catch(() => {});
+  const buffer = soundBuffers[name];
+  if (audioCtx && buffer) {
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start();
+  } else if (!audioCtx || soundFailed[name]) {
+    new Audio(SOUNDS[name]).play().catch(() => {});
+  }
 }
 
 function createCounter(el, digits) {
