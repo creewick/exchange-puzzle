@@ -76,6 +76,17 @@ const soundData = Object.fromEntries(Object.entries(SOUNDS).map(([name, src]) =>
 const soundBuffers = {};
 const soundFailed = {};
 let audioCtx = null;
+let audioWasRunning = false;
+
+function createAudioContext() {
+  if (audioCtx) audioCtx.close().catch(() => {});
+  audioWasRunning = false;
+  const ctx = new AudioContextClass();
+  ctx.addEventListener('statechange', () => {
+    if (ctx === audioCtx && ctx.state === 'running') audioWasRunning = true;
+  });
+  audioCtx = ctx;
+}
 
 function decodeSounds() {
   for (const [name, data] of Object.entries(soundData)) {
@@ -93,10 +104,15 @@ function decodeSounds() {
 function unlockAudio() {
   if (!AudioContextClass) return;
   if (!audioCtx) {
-    audioCtx = new AudioContextClass();
+    createAudioContext();
     decodeSounds();
+  } else if (audioCtx.state !== 'running' && audioWasRunning) {
+    createAudioContext();
   }
-  if (audioCtx.state === 'running') return;
+  if (audioCtx.state === 'running') {
+    audioWasRunning = true;
+    return;
+  }
   const silence = audioCtx.createBufferSource();
   silence.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
   silence.connect(audioCtx.destination);

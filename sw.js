@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'exchange-puzzle-v7';
+const CACHE = 'exchange-puzzle-v8';
 
 const ASSETS = [
   './',
@@ -57,9 +57,9 @@ async function rangeResponse(request, response) {
   });
 }
 
-async function refresh(cache, request) {
+async function refresh(cache, request, init) {
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, init);
     if (response.ok && response.status === 200) await cache.put(request, response.clone());
     return response;
   } catch {
@@ -67,12 +67,22 @@ async function refresh(cache, request) {
   }
 }
 
+function isCode(request) {
+  return request.mode === 'navigate' || /\.(html|css|js)$/.test(new URL(request.url).pathname);
+}
+
 async function handle(event) {
   const { request } = event;
   const cache = await caches.open(CACHE);
   const key = request.mode === 'navigate' ? 'index.html' : new Request(request.url);
-  const cached = await cache.match(key, { ignoreSearch: true });
 
+  if (isCode(request)) {
+    const fresh = await refresh(cache, key, { cache: 'no-cache' });
+    if (fresh && fresh.ok) return fresh;
+    return (await cache.match(key, { ignoreSearch: true })) || fresh || Response.error();
+  }
+
+  const cached = await cache.match(key, { ignoreSearch: true });
   if (cached) {
     if (request.headers.has('range')) return rangeResponse(request, cached);
     event.waitUntil(refresh(cache, key));
