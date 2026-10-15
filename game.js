@@ -3,7 +3,7 @@
 const VALUES = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000];
 const MAX_CODE = 8;
 
-for (const value of VALUES.slice(1)) new Image().src = `textures/${value}.png`;
+for (const value of VALUES.slice(1)) new Image().src = `images/${value}.png`;
 
 
 const SOUNDS = {
@@ -223,14 +223,9 @@ function createCoinEl(code, r, c) {
   el.style.setProperty('--r', r);
   const face = document.createElement('div');
   face.className = 'coin__face';
-  const art = document.createElement('div');
-  art.className = 'coin__art';
   const tex = document.createElement('div');
   tex.className = 'coin__tex';
-  const tint = document.createElement('div');
-  tint.className = 'coin__tint';
-  art.append(tex, tint);
-  face.append(art);
+  face.append(tex);
   el.append(face);
   coinsEl.append(el);
   return el;

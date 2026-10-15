@@ -41,6 +41,8 @@
   --tilt-max: 18deg;
   --frame-pad: 14px;
   --flatten: 80%;
+  --texture-contrast: 0.85;
+  --texture-brightness: 1.1;
   --cols: 6;
   --rows: 9;
   --cell-size: 54px;
@@ -373,7 +375,6 @@ body {
   place-items: center;
   transform: translate(calc(var(--c) * 100%), calc(var(--r) * 100%));
   transition: transform var(--fall, 0.3s) var(--fall-ease);
-  will-change: transform;
   pointer-events: none;
 }
 
@@ -389,35 +390,25 @@ body {
     rotateX(calc(var(--tilt-y, 0) * var(--tilt-max) * -1))
     rotateY(calc(var(--tilt-x, 0) * var(--tilt-max)))
     scale(var(--scale));
-  transition: transform 0.15s ease-out;
+  transition: transform 0.15s ease-out, box-shadow 0.12s;
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
-.coin__art {
+.coin__tex {
   position: absolute;
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  will-change: transform;
-}
-
-.coin__tex {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--texture) center / contain no-repeat;
-}
-
-.coin__tint {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--tint);
-  mix-blend-mode: color;
-  opacity: var(--flatten);
-  pointer-events: none;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--tint) var(--flatten), transparent),
+      color-mix(in srgb, var(--tint) var(--flatten), transparent)
+    ),
+    var(--texture) center / contain no-repeat;
+  background-blend-mode: color, normal;
+  filter: contrast(var(--texture-contrast)) brightness(var(--texture-brightness));
 }
 
 .coin__face::before,
@@ -433,7 +424,6 @@ body {
     calc(var(--light-at) - var(--tilt-x, 0) * 18%)
     calc(var(--light-at) - var(--tilt-y, 0) * 18%);
   transition: background-position 0.15s ease-out;
-  will-change: transform;
   pointer-events: none;
 }
 
@@ -460,24 +450,24 @@ body {
   mix-blend-mode: overlay;
 }
 
-.coin[data-code="1"] .coin__art,
+.coin[data-code="1"] .coin__tex,
 .coin[data-code="1"] .coin__face::before,
 .coin[data-code="1"] .coin__face::after,
-.coin[data-code="3"] .coin__art,
+.coin[data-code="3"] .coin__tex,
 .coin[data-code="3"] .coin__face::before,
 .coin[data-code="3"] .coin__face::after {
   -webkit-mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
   mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
 }
 
-.coin[data-code="1"] { --texture: url("textures/5.png"); --coin-size: 75%; --hole: 23%; --tint: #b89c4a; }
-.coin[data-code="2"] { --texture: url("textures/10.png"); --coin-size: 78%; --tint: #b07657; }
-.coin[data-code="3"] { --texture: url("textures/50.png"); --coin-size: 81%; --hole: 21%; --tint: #7a8ea3; }
-.coin[data-code="4"] { --texture: url("textures/100.png"); --coin-size: 84%; --tint: #c4c4c4; }
-.coin[data-code="5"] { --texture: url("textures/500.png"); --coin-size: 88%; --tint: #c0b966; }
-.coin[data-code="6"] { --texture: url("textures/1000.png"); --tint: #8d9ac4; }
-.coin[data-code="7"] { --texture: url("textures/5000.png"); --tint: #a690b4; }
-.coin[data-code="8"] { --texture: url("textures/10000.png"); --tint: #c4917c; }
+.coin[data-code="1"] { --texture: url("images/5.png"); --coin-size: 75%; --hole: 23%; --tint: #b89c4a; }
+.coin[data-code="2"] { --texture: url("images/10.png"); --coin-size: 78%; --tint: #b07657; }
+.coin[data-code="3"] { --texture: url("images/50.png"); --coin-size: 81%; --hole: 21%; --tint: #7a8ea3; --texture-brightness: 0.95; }
+.coin[data-code="4"] { --texture: url("images/100.png"); --coin-size: 84%; --tint: #c4c4c4; --texture-brightness: 1.22; }
+.coin[data-code="5"] { --texture: url("images/500.png"); --coin-size: 88%; --tint: #c0b966; }
+.coin[data-code="6"] { --texture: url("images/1000.png"); --tint: #8d9ac4; }
+.coin[data-code="7"] { --texture: url("images/5000.png"); --tint: #a690b4; }
+.coin[data-code="8"] { --texture: url("images/10000.png"); --tint: #c4917c; }
 
 .coin[data-code="6"] .coin__face,
 .coin[data-code="7"] .coin__face,
@@ -491,7 +481,7 @@ body {
 .coin[data-code="6"] .coin__tex,
 .coin[data-code="7"] .coin__tex,
 .coin[data-code="8"] .coin__tex {
-  background-size: 100% 100%;
+  background-size: auto, 100% 100%;
 }
 
 .coin.is-selected .coin__face {
