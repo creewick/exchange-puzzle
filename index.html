@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Размен монет</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hud">
+      <div class="hud__row">
+        <div class="toolbar">
+          <button id="undo" type="button" title="Отменить ход (⌘Z / Ctrl+Z)" aria-label="Отменить ход" disabled><svg class="toolbar__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+          <button id="redo" type="button" title="Повторить ход (⇧⌘Z / Ctrl+Y)" aria-label="Повторить ход" disabled><svg class="toolbar__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
+        </div>
+        <div class="controls">
+          <select id="level" aria-label="Уровень сложности">
+            <option value="0">Лёгкий</option>
+            <option value="1">Средний</option>
+            <option value="2">Сложный</option>
+          </select>
+          <button id="restart" type="button">Новая игра</button>
+        </div>
+      </div>
+      <div class="hud__row">
+        <div class="score">
+          <span class="score__label">Счёт</span>
+          <div class="register" id="score"></div>
+        </div>
+        <div class="score score--best">
+          <span class="score__label">Рекорд</span>
+          <div class="register register--small" id="best"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="frame">
+      <div class="board" id="board">
+        <div class="grid" aria-hidden="true"></div>
+        <div class="coins" id="coins"></div>
+        <svg class="chain" id="chain" preserveAspectRatio="none" aria-hidden="true">
+          <polyline id="chainLine" points=""></polyline>
+        </svg>
+      </div>
+
+      <div class="overlay" id="gameOver" hidden>
+        <div class="overlay__card" role="dialog" aria-labelledby="gameOverTitle">
+          <h2 class="overlay__title" id="gameOverTitle">Ходов больше нет</h2>
+          <p class="overlay__label">Итоговый счёт</p>
+          <p class="overlay__score" id="finalScore">0 ¥</p>
+          <p class="overlay__record" id="newRecord" hidden>Новый рекорд!</p>
+          <p class="overlay__best" id="finalBest"></p>
+          <div class="overlay__actions">
+            <button class="overlay__button overlay__button--secondary" id="undoLast" type="button">Отменить ход</button>
+            <button class="overlay__button" id="playAgain" type="button">Новая игра</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottombar">
+      <button id="hint" class="hint-button" type="button"><span aria-hidden="true">💡</span>Подсказка</button>
+    </div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
