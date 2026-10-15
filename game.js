@@ -548,7 +548,9 @@ function updateTilt(event) {
   }
 
   const el = grid[r]?.[c]?.el;
-  if (el) next.set(el, [(x - c - 0.5) * 2, (y - r - 0.5) * 2]);
+  if (el && (event.pointerType === 'mouse' || next.has(el))) {
+    next.set(el, [(x - c - 0.5) * 2, (y - r - 0.5) * 2]);
+  }
 
   for (const old of tiltedEls) {
     if (!next.has(old)) {
