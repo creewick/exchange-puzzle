@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'exchange-puzzle-v4';
+const CACHE = 'exchange-puzzle-v5';
 
 const ASSETS = [
   './',
@@ -15,9 +15,9 @@ const ASSETS = [
   'images/1000.png',
   'images/5000.png',
   'images/10000.png',
-  'sounds/click.wav',
-  'sounds/coin.wav',
-  'sounds/banknote.wav',
+  'sounds/click.m4a',
+  'sounds/coin.m4a',
+  'sounds/banknote.m4a',
 ];
 
 self.addEventListener('install', (event) => {

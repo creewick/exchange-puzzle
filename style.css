@@ -391,16 +391,23 @@ body {
     rotateX(calc(var(--tilt-y, 0) * var(--tilt-max) * -1))
     rotateY(calc(var(--tilt-x, 0) * var(--tilt-max)))
     scale(var(--scale));
-  transition: transform 0.15s ease-out, box-shadow 0.12s;
+  transition: transform 0.15s ease-out;
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
-.coin__tex {
+.coin__art {
   position: absolute;
   inset: 0;
   z-index: -1;
+  border-radius: inherit;
+  will-change: transform;
+}
+
+.coin__tex {
+  position: absolute;
+  inset: 0;
   border-radius: inherit;
   background: var(--texture) center / contain no-repeat;
   filter: contrast(var(--texture-contrast)) brightness(var(--texture-brightness));
@@ -429,6 +436,7 @@ body {
     calc(var(--light-at) - var(--tilt-x, 0) * 18%)
     calc(var(--light-at) - var(--tilt-y, 0) * 18%);
   transition: background-position 0.15s ease-out;
+  will-change: transform;
   pointer-events: none;
 }
 
@@ -455,10 +463,10 @@ body {
   mix-blend-mode: overlay;
 }
 
-.coin[data-code="1"] .coin__tint,
+.coin[data-code="1"] .coin__art,
 .coin[data-code="1"] .coin__face::before,
 .coin[data-code="1"] .coin__face::after,
-.coin[data-code="3"] .coin__tint,
+.coin[data-code="3"] .coin__art,
 .coin[data-code="3"] .coin__face::before,
 .coin[data-code="3"] .coin__face::after {
   -webkit-mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));

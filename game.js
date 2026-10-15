@@ -7,9 +7,9 @@ for (const value of VALUES.slice(1)) new Image().src = `images/${value}.png`;
 
 
 const SOUNDS = {
-  click: 'sounds/click.wav',
-  coin: 'sounds/coin.wav',
-  banknote: 'sounds/banknote.wav',
+  click: 'sounds/click.m4a',
+  coin: 'sounds/coin.m4a',
+  banknote: 'sounds/banknote.m4a',
 };
 const BANKNOTE_MIN_CODE = 6;
 
@@ -91,13 +91,14 @@ function unlockAudio() {
   if (!AudioContextClass) return;
   if (!audioCtx) {
     audioCtx = new AudioContextClass();
-    const silence = audioCtx.createBufferSource();
-    silence.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
-    silence.connect(audioCtx.destination);
-    silence.start(0);
     decodeSounds();
   }
-  if (audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+  if (audioCtx.state === 'running') return;
+  const silence = audioCtx.createBufferSource();
+  silence.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+  silence.connect(audioCtx.destination);
+  silence.start(0);
+  audioCtx.resume().catch(() => {});
 }
 
 function playSound(name) {
@@ -113,7 +114,7 @@ function playSound(name) {
   }
 }
 
-for (const type of ['pointerdown', 'pointerup', 'touchend', 'click']) {
+for (const type of ['touchend', 'pointerup', 'click', 'keydown']) {
   document.addEventListener(type, unlockAudio, { capture: true, passive: true });
 }
 
@@ -219,11 +220,14 @@ function createCoinEl(code, r, c) {
   el.style.setProperty('--r', r);
   const face = document.createElement('div');
   face.className = 'coin__face';
+  const art = document.createElement('div');
+  art.className = 'coin__art';
   const tex = document.createElement('div');
   tex.className = 'coin__tex';
   const tint = document.createElement('div');
   tint.className = 'coin__tint';
-  face.append(tex, tint);
+  art.append(tex, tint);
+  face.append(art);
   el.append(face);
   coinsEl.append(el);
   return el;
