@@ -54,6 +54,21 @@
         </svg>
       </div>
 
+      <div class="overlay" id="startScreen">
+        <div class="overlay__card" role="dialog" aria-labelledby="startTitle">
+          <h2 class="overlay__title" id="startTitle">Размен монет</h2>
+          <p class="overlay__label">Сложность</p>
+          <div class="level-picker" role="radiogroup" aria-label="Сложность">
+            <button type="button" role="radio" data-level="0">Лёгкий</button>
+            <button type="button" role="radio" data-level="1">Средний</button>
+            <button type="button" role="radio" data-level="2">Сложный</button>
+          </div>
+          <div class="overlay__actions">
+            <button class="overlay__button" id="startGame" type="button">Начать игру</button>
+          </div>
+        </div>
+      </div>
+
       <div class="overlay" id="gameOver" hidden>
         <div class="overlay__card" role="dialog" aria-labelledby="gameOverTitle">
           <h2 class="overlay__title" id="gameOverTitle">Ходов больше нет</h2>

@@ -41,8 +41,6 @@
   --tilt-max: 18deg;
   --frame-pad: 14px;
   --flatten: 80%;
-  --texture-contrast: 0.85;
-  --texture-brightness: 1.1;
   --cols: 6;
   --rows: 9;
   --cell-size: 54px;
@@ -410,7 +408,6 @@ body {
   inset: 0;
   border-radius: inherit;
   background: var(--texture) center / contain no-repeat;
-  filter: contrast(var(--texture-contrast)) brightness(var(--texture-brightness));
 }
 
 .coin__tint {
@@ -473,14 +470,14 @@ body {
   mask: radial-gradient(circle closest-side, transparent var(--hole), #000 calc(var(--hole) + 2%));
 }
 
-.coin[data-code="1"] { --texture: url("images/5.png"); --coin-size: 75%; --hole: 23%; --tint: #b89c4a; }
-.coin[data-code="2"] { --texture: url("images/10.png"); --coin-size: 78%; --tint: #b07657; }
-.coin[data-code="3"] { --texture: url("images/50.png"); --coin-size: 81%; --hole: 21%; --tint: #7a8ea3; --texture-brightness: 0.95; }
-.coin[data-code="4"] { --texture: url("images/100.png"); --coin-size: 84%; --tint: #c4c4c4; --texture-brightness: 1.22; }
-.coin[data-code="5"] { --texture: url("images/500.png"); --coin-size: 88%; --tint: #c0b966; }
-.coin[data-code="6"] { --texture: url("images/1000.png"); --tint: #8d9ac4; }
-.coin[data-code="7"] { --texture: url("images/5000.png"); --tint: #a690b4; }
-.coin[data-code="8"] { --texture: url("images/10000.png"); --tint: #c4917c; }
+.coin[data-code="1"] { --texture: url("textures/5.png"); --coin-size: 75%; --hole: 23%; --tint: #b89c4a; }
+.coin[data-code="2"] { --texture: url("textures/10.png"); --coin-size: 78%; --tint: #b07657; }
+.coin[data-code="3"] { --texture: url("textures/50.png"); --coin-size: 81%; --hole: 21%; --tint: #7a8ea3; }
+.coin[data-code="4"] { --texture: url("textures/100.png"); --coin-size: 84%; --tint: #c4c4c4; }
+.coin[data-code="5"] { --texture: url("textures/500.png"); --coin-size: 88%; --tint: #c0b966; }
+.coin[data-code="6"] { --texture: url("textures/1000.png"); --tint: #8d9ac4; }
+.coin[data-code="7"] { --texture: url("textures/5000.png"); --tint: #a690b4; }
+.coin[data-code="8"] { --texture: url("textures/10000.png"); --tint: #c4917c; }
 
 .coin[data-code="6"] .coin__face,
 .coin[data-code="7"] .coin__face,
@@ -682,6 +679,11 @@ body {
     gap: 2px;
   }
 
+  .frame,
+  .overlay {
+    border-radius: 0;
+  }
+
   .frame {
     align-self: stretch;
     display: flex;
@@ -691,4 +693,30 @@ body {
       inset 0 1px 0 rgb(255 255 255 / 0.35),
       inset 0 -3px 0 rgb(0 0 0 / 0.12);
   }
+}
+
+.level-picker {
+  display: flex;
+  margin-top: 8px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--border-soft);
+  gap: 3px;
+}
+
+.level-picker button {
+  flex: 1;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.level-picker button[aria-checked="true"] {
+  background: var(--surface);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
 }

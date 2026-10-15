@@ -3,7 +3,7 @@
 const VALUES = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000];
 const MAX_CODE = 8;
 
-for (const value of VALUES.slice(1)) new Image().src = `images/${value}.png`;
+for (const value of VALUES.slice(1)) new Image().src = `textures/${value}.png`;
 
 
 const SOUNDS = {
@@ -61,6 +61,9 @@ const undoBtn = document.getElementById('undo');
 const hintBtn = document.getElementById('hint');
 const redoBtn = document.getElementById('redo');
 const undoLastBtn = document.getElementById('undoLast');
+const startScreenEl = document.getElementById('startScreen');
+const startGameBtn = document.getElementById('startGame');
+const levelPickerBtns = [...document.querySelectorAll('.level-picker button')];
 
 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 const soundData = Object.fromEntries(Object.entries(SOUNDS).map(([name, src]) => [
@@ -249,6 +252,38 @@ function dropNewCoins(spawns) {
   for (const s of spawns) moveCoinTo(s.el, s.r, s.fromR);
 }
 
+const LEVEL_KEY = 'exchange-puzzle:level';
+
+function loadLevel() {
+  try {
+    const value = Number(localStorage.getItem(LEVEL_KEY));
+    return LEVELS[value] ? value : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveLevel(value) {
+  try {
+    localStorage.setItem(LEVEL_KEY, String(value));
+  } catch {
+  }
+}
+
+function pickLevel(value) {
+  for (const btn of levelPickerBtns) {
+    btn.setAttribute('aria-checked', String(Number(btn.dataset.level) === value));
+  }
+}
+
+function startGame() {
+  const picked = levelPickerBtns.find((btn) => btn.getAttribute('aria-checked') === 'true');
+  levelSelect.value = picked ? picked.dataset.level : '0';
+  saveLevel(Number(levelSelect.value));
+  startScreenEl.hidden = true;
+  newGame();
+}
+
 function bestKey() {
   return `exchange-puzzle:best:${level}`;
 }
@@ -318,7 +353,7 @@ function hasMoves(codes) {
 }
 
 function showHint() {
-  if (isMerging || isOver) return;
+  if (isMerging || isOver || !startScreenEl.hidden) return;
   clearHint();
   const path = findMove(currentCodes(), true);
   if (!path) return;
@@ -706,9 +741,19 @@ document.addEventListener('keydown', (e) => {
   e.preventDefault();
 });
 playAgainBtn.addEventListener('click', newGame);
-levelSelect.addEventListener('change', newGame);
+levelSelect.addEventListener('change', () => {
+  saveLevel(Number(levelSelect.value));
+  newGame();
+});
+for (const btn of levelPickerBtns) {
+  btn.addEventListener('click', () => pickLevel(Number(btn.dataset.level)));
+}
+startGameBtn.addEventListener('click', startGame);
 
+levelSelect.value = String(loadLevel());
+pickLevel(loadLevel());
 newGame();
+startGameBtn.focus();
 
 if ('serviceWorker' in navigator && window.isSecureContext) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

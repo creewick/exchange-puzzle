@@ -1,20 +1,20 @@
 'use strict';
 
-const CACHE = 'exchange-puzzle-v5';
+const CACHE = 'exchange-puzzle-v6';
 
 const ASSETS = [
   './',
   'index.html',
   'style.css',
   'game.js',
-  'images/5.png',
-  'images/10.png',
-  'images/50.png',
-  'images/100.png',
-  'images/500.png',
-  'images/1000.png',
-  'images/5000.png',
-  'images/10000.png',
+  'textures/5.png',
+  'textures/10.png',
+  'textures/50.png',
+  'textures/100.png',
+  'textures/500.png',
+  'textures/1000.png',
+  'textures/5000.png',
+  'textures/10000.png',
   'sounds/click.m4a',
   'sounds/coin.m4a',
   'sounds/banknote.m4a',
